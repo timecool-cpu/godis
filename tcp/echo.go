@@ -42,7 +42,7 @@ func (c *EchoClient) Close() error {
 
 // Handle echos received line to client
 func (h *EchoHandler) Handle(ctx context.Context, conn net.Conn) {
-	if h.closing.Get() {
+	if h.closing.Get() { //如果服务器关闭则关闭连接
 		// closing handler refuse new connection
 		_ = conn.Close()
 		return
@@ -51,7 +51,7 @@ func (h *EchoHandler) Handle(ctx context.Context, conn net.Conn) {
 	client := &EchoClient{
 		Conn: conn,
 	}
-	h.activeConn.Store(client, struct{}{})
+	h.activeConn.Store(client, struct{}{}) //放到现成同步的set中(map实现）
 
 	reader := bufio.NewReader(conn)
 	for {
@@ -78,8 +78,8 @@ func (h *EchoHandler) Handle(ctx context.Context, conn net.Conn) {
 // Close stops echo handler
 func (h *EchoHandler) Close() error {
 	logger.Info("handler shutting down...")
-	h.closing.Set(true)
-	h.activeConn.Range(func(key interface{}, val interface{}) bool {
+	h.closing.Set(true)                                              //设置标识
+	h.activeConn.Range(func(key interface{}, val interface{}) bool { //遍历所有连接并关闭
 		client := key.(*EchoClient)
 		_ = client.Close()
 		return true

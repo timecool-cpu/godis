@@ -27,18 +27,18 @@ func TestListenAndServe(t *testing.T) {
 	}
 	for i := 0; i < 10; i++ {
 		val := strconv.Itoa(rand.Int())
-		_, err = conn.Write([]byte(val + "\n"))
+		_, err = conn.Write([]byte(val + "\n")) // 客户端发送数据
 		if err != nil {
 			t.Error(err)
 			return
 		}
-		bufReader := bufio.NewReader(conn)
+		bufReader := bufio.NewReader(conn) // 客户端接收数据
 		line, _, err := bufReader.ReadLine()
 		if err != nil {
 			t.Error(err)
 			return
 		}
-		if string(line) != val {
+		if string(line) != val { // 判断是否收到相同的数据
 			t.Error("get wrong response")
 			return
 		}
